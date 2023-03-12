@@ -9,7 +9,7 @@ data "external" "subnet" {
 
 resource "helm_release" "metallb" {
   name             = "metallb"
-  repository       = "https://metallb.github.io/metallb"
+  repository       = "https://charts.bitnami.com/bitnami"
   chart            = "metallb"
   namespace        = "metallb"
   version          = var.METALLB_VERSION
