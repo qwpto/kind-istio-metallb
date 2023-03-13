@@ -1,13 +1,17 @@
+# locals {
+#   is_linux = length(regexall("/home/", lower(abspath(path.root)))) > 0
+# }
+
 resource "null_resource" "download_istio" {
   triggers = {
     ISTIO_VERSION = var.ISTIO_VERSION
   }
   provisioner "local-exec" {
-    command = "curl -L https://istio.io/downloadIstio | ISTIO_VERSION=${self.triggers.ISTIO_VERSION} sh -"
+    command = local.is_linux ? "curl -L https://istio.io/downloadIstio | ISTIO_VERSION=${self.triggers.ISTIO_VERSION} sh -" : "curl -fsLO https://github.com/istio/istio/releases/download/${self.triggers.ISTIO_VERSION}/istio-${self.triggers.ISTIO_VERSION}-win.zip && tar -xf istio-${self.triggers.ISTIO_VERSION}-win.zip && rm istio-${self.triggers.ISTIO_VERSION}-win.zip"
   }
   provisioner "local-exec" {
     when    = destroy
-    command = "rm -r ${path.root}/istio-${self.triggers.ISTIO_VERSION}"
+    command = length(regexall("/home/", lower(abspath(path.root)))) > 0 ? "rm -r ${path.root}/istio-${self.triggers.ISTIO_VERSION}" : "if exist ${path.root}/istio-${self.triggers.ISTIO_VERSION} rd -r ${path.root}/istio-${self.triggers.ISTIO_VERSION}"
   }
   depends_on = [
     helm_release.metallb
@@ -33,6 +37,7 @@ resource "helm_release" "istio-operator" {
   chart           = "istio-operator"
   namespace       = kubernetes_namespace.istio-operator.metadata[0].name
   cleanup_on_fail = true
+  # wait            = false
 }
 resource "kubernetes_namespace" "istio-system" {
   metadata {

@@ -23,6 +23,7 @@ provider "kubernetes" {
   config_path    = "~/.kube/config"
 }
 provider "helm" {
+  debug = true
   kubernetes {
     config_context = kind_cluster.k8s-cluster.context
     config_path    = "~/.kube/config"

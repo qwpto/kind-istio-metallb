@@ -9,11 +9,13 @@ data "external" "subnet" {
 
 resource "helm_release" "metallb" {
   name             = "metallb"
-  repository       = "https://charts.bitnami.com/bitnami"
+  repository       = "https://metallb.github.io/metallb"
   chart            = "metallb"
   namespace        = "metallb"
   version          = var.METALLB_VERSION
   create_namespace = true
+  #timeout          = 900
+  # wait             = false
   values = [
   <<-EOF
   configInline:
