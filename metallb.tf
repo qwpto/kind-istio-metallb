@@ -11,6 +11,12 @@ data "external" "subnet" {
 #kubectl create secret generic -n metallb-system metallb-memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
 #kubectl create secret generic -n metallb metallb-memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
 #kubectl create secret generic -n metallb memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+resource "null_resource" "memberlist" {
+  provisioner "local-exec" {
+    command = "kubectl create namespace metallb && kubectl create secret generic -n metallb memberlist --from-literal=secretkey='rDjRf01nnsng3XVjs3+CMS2wThYxJVZY+7jVvR0t7ggNTXZqaxce//hHb8UE6M5z699AVbqg9DK4Knad8X97m30arOEG6UijMGMLf4L9NuMLZ2cqVsozIdRhVQpCGNaHVoIJmygf0sA1hBQQa7UppUiGso95aOFIneQgIoLnTVg='"
+  }
+  depends_on = [kind_cluster.k8s-cluster]
+}
 
 resource "helm_release" "metallb" {
   name             = "metallb"
@@ -19,7 +25,7 @@ resource "helm_release" "metallb" {
   namespace        = "metallb"
   version          = var.METALLB_VERSION
   create_namespace = true
-  timeout          = 120
+  timeout          = 900
   # wait             = false
   values = [
   <<-EOF
