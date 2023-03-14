@@ -7,6 +7,11 @@ data "external" "subnet" {
   depends_on = [kind_cluster.k8s-cluster]
 }
 
+#https://github.com/metallb/metallb/issues/888
+#kubectl create secret generic -n metallb-system metallb-memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+#kubectl create secret generic -n metallb metallb-memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+#kubectl create secret generic -n metallb memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+
 resource "helm_release" "metallb" {
   name             = "metallb"
   repository       = "https://metallb.github.io/metallb"
@@ -14,10 +19,12 @@ resource "helm_release" "metallb" {
   namespace        = "metallb"
   version          = var.METALLB_VERSION
   create_namespace = true
-  #timeout          = 900
+  timeout          = 120
   # wait             = false
   values = [
   <<-EOF
+  speaker:
+    secretName: memberlist
   configInline:
     address-pools:
     - name: default
