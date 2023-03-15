@@ -7,7 +7,7 @@ resource "null_resource" "download_istio" {
     ISTIO_VERSION = var.ISTIO_VERSION
   }
   provisioner "local-exec" {
-    command = local.is_linux ? "curl -L https://istio.io/downloadIstio | ISTIO_VERSION=${self.triggers.ISTIO_VERSION} sh -" : "curl -fsLO https://github.com/istio/istio/releases/download/${self.triggers.ISTIO_VERSION}/istio-${self.triggers.ISTIO_VERSION}-win.zip && tar -xf istio-${self.triggers.ISTIO_VERSION}-win.zip && rm istio-${self.triggers.ISTIO_VERSION}-win.zip"
+    command = local.is_linux ? "curl -L https://istio.io/downloadIstio | ISTIO_VERSION=${self.triggers.ISTIO_VERSION} sh -" : "curl -fsLO https://github.com/istio/istio/releases/download/${self.triggers.ISTIO_VERSION}/istio-${self.triggers.ISTIO_VERSION}-win.zip && tar -xf istio-${self.triggers.ISTIO_VERSION}-win.zip && del istio-${self.triggers.ISTIO_VERSION}-win.zip"
   }
   provisioner "local-exec" {
     when    = destroy
